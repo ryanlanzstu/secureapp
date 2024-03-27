@@ -1,23 +1,23 @@
-from flask import Flask,render_template,request,session,logging,url_for,redirect
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session,sessionmaker
+from flask import Flask,render_template,request,redirect, url_for, session
+from flask_mysqldb import MySQL
 
 app = Flask(__name__)
+app.secret_key = 'your-secret-key'
 
-@app.route("/")
+#MySQL config
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_DB'] = 'flask_users'
+
+mysql = MySQL(app)
+
+@app.route('/')
 def home():
-    return render_template("home.html")
-
-# Register form
-@app.route("/register")
-def register():
-    return render_template("register.html")
-
-# Login form
-@app.route("/login")
-def login():
-    return render_template("login.html")
-
-
-if __name__ == "__main__":
+    if 'username' in session:
+        return render_template('home.html', username=session['username'])
+    else:
+        return render_template('home.html')
+    
+if __name__ == '__main__':
     app.run(debug=True)
