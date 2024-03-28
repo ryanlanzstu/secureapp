@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_mysqldb import MySQL
+from flask import jsonify
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
@@ -53,6 +54,28 @@ def register():
 def logout():
     session.pop('username', None)
     return redirect(url_for('home'))
+
+@app.route('/xss', methods=['GET', 'POST'])
+def xss_demo():
+    user_input = ''
+    if request.method == 'POST':
+        # No sanitization
+        user_input = request.form.get('user_input', '')
+    # Passed to the template
+    return render_template('xss.html', user_input=user_input)
+
+@app.route('/get_user_details')
+def get_user_details():
+    username = 'admin'  #Uses admin for example
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT username, password FROM tbl_users WHERE username = %s", (username,)) # Fetches details from the flask_user table
+    user = cur.fetchone() #Fetches the row of data containing admin
+    cur.close()
+    if user:
+        return jsonify({"username": user[0], "password": user[1]}) #If it contains the user data, it's displayed
+    else:
+        return jsonify({"error": "User not found"}), 404
+
 
 if __name__ == '__main__':
     app.run(debug=True)

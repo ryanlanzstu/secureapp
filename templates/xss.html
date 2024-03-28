@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container">
+    <head>
+        <meta charset="UTF-8">
+        <title>XSS Demo</title>
+    </head>
+    <body>
+        <h2>XSS Vulnerability Demonstration</h2>
+        <form method="post">
+            <input type="text" name="user_input" placeholder="Enter some text">
+            <input type="submit" value="Submit">
+        </form>
+        <!-- Used for XSS, bad practice -->
+        <div id="output">Output: {{ user_input|safe }}</div>
+    </body>
+    </div>
+{% endblock %}

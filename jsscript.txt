@@ -1,0 +1,10 @@
+<script>
+fetch('/get_user_details')
+  .then(response => response.json()) // 1
+  .then(data => { // 2
+    const outputDiv = document.getElementById('output'); // 3
+    outputDiv.innerHTML = `Stolen login details: username=${data.username}, password=${data.password}`; // 4
+  });
+</script>
+
+
