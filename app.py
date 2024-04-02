@@ -42,7 +42,7 @@ def login():
 def register():
     if request.method == 'POST':
         username = request.form['username']
-        pwd = request.form['password']
+        pwd = request.form['password'] #Sensitive Data Exposure
         cur = mysql.connection.cursor()
         cur.execute(f"INSERT INTO tbl_users (username, password) VALUES ('{username}', '{pwd}')")
         mysql.connection.commit()
@@ -55,6 +55,8 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('home'))
 
+
+#Reflective XSS
 @app.route('/xss', methods=['GET', 'POST'])
 def xss_demo():
     user_input = ''
@@ -64,17 +66,22 @@ def xss_demo():
     # Passed to the template
     return render_template('xss.html', user_input=user_input)
 
+#Reflective XSS
 @app.route('/get_user_details')
 def get_user_details():
     username = 'admin'  #Uses admin for example
     cur = mysql.connection.cursor()
-    cur.execute("SELECT username, password FROM tbl_users WHERE username = %s", (username,)) # Fetches details from the flask_user table
+    cur.execute("SELECT username, password FROM tbl_users WHERE username = %s", (username,)) #Fetches details from the flask_user table
     user = cur.fetchone() #Fetches the row of data containing admin
     cur.close()
     if user:
         return jsonify({"username": user[0], "password": user[1]}) #If it contains the user data, it's displayed
     else:
         return jsonify({"error": "User not found"}), 404
+    
+@app.route('/xss/dom')
+def dom_xss_demo():
+    return render_template('xss_dom.html')
 
 
 if __name__ == '__main__':
