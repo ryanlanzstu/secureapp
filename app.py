@@ -61,9 +61,9 @@ def logout():
 def xss_demo():
     user_input = ''
     if request.method == 'POST':
-        # No sanitization
+        #No sanitization
         user_input = request.form.get('user_input', '')
-    # Passed to the template
+    #Passed to the template
     return render_template('xss.html', user_input=user_input)
 
 #Reflective XSS
@@ -82,6 +82,36 @@ def get_user_details():
 @app.route('/xss/dom')
 def dom_xss_demo():
     return render_template('xss_dom.html')
+
+
+@app.route('/log_xss', methods=['POST'])
+def log_xss():
+    user_input = request.form.get('user_input', '')
+    username = session.get('username', None)
+
+    if username and user_input:
+        try:
+            cur = mysql.connection.cursor()
+            cur.execute("INSERT INTO tbl_xss (username, xss_text) VALUES (%s, %s)", (username, user_input))
+            mysql.connection.commit()
+            print("XSS submission logged successfully.")
+        except Exception as e:
+            print(f"Error logging XSS submission: {e}")
+        finally:
+            cur.close()
+    else:
+        print("No username in session or empty user input.")
+
+    return '', 204  #Kept on loggin the attack but then not displaying the attack
+
+
+@app.route('/xss_logs')
+def xss_logs():
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM tbl_xss ORDER BY time DESC") 
+    logs = cur.fetchall()
+    cur.close()
+    return render_template('xss_logs.html', logs=logs)
 
 
 if __name__ == '__main__':

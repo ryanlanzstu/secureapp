@@ -7,12 +7,29 @@
     </head>
     <body>
         <h2>XSS Vulnerability Demonstration</h2>
-        <form method="post">
+        <!-- No need to add IDs if they interfere with your demonstration -->
+        <form method="post"> 
             <input type="text" name="user_input" placeholder="Enter some text">
             <input type="submit" value="Submit">
         </form>
-        <!-- Used for XSS, bad practice -->
+        <!-- Used for XSS, demonstrating the vulnerability -->
         <div id="output">Output: {{ user_input|safe }}</div>
     </body>
-    </div>
+</div>
+
+<script>
+//Dom's loaded
+//https://developer.mozilla.org/en-US/docs/Web/API/Document/DOMContentLoaded_event
+document.addEventListener("DOMContentLoaded", function() {
+    //Add listener
+    document.querySelector("form").onsubmit = function(event) {
+        //Get input
+        var userInput = this.querySelector('input[name="user_input"]').value;
+        //IMPORTANT!! Logs the input but still displays the attack
+        //Referenced
+        //https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
+        navigator.sendBeacon('/log_xss', new URLSearchParams({user_input: userInput}));
+    };
+});
+</script>
 {% endblock %}

@@ -7,4 +7,6 @@ fetch('/get_user_details')
   });
 </script>
 
+<script>alert('XSS');</script>
+
 
