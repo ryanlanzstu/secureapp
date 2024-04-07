@@ -113,6 +113,7 @@ def xss_logs():
     cur.close()
     return render_template('xss_logs.html', logs=logs)
 
+#https://stackoverflow.com/questions/63290047/flask-csp-content-security-policy-best-practice-against-attack-such-as-cross
 @app.after_request
 def add_security_headers(resp):
     resp.headers['Content-Security-Policy']='default-src \'self\''
