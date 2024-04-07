@@ -27,7 +27,7 @@ def login():
         username = request.form['username']
         pwd = request.form['password']
         cur = mysql.connection.cursor()
-        cur.execute(f"SELECT username, password from tbl_users WHERE username = '{username}'")
+        cur.execute("SELECT username, password from tbl_users WHERE username = %s", (username,)) #Add parameterized queries instead
         user = cur.fetchone()
         cur.close()
         if user and pwd == user[1]:
@@ -112,6 +112,11 @@ def xss_logs():
     logs = cur.fetchall()
     cur.close()
     return render_template('xss_logs.html', logs=logs)
+
+@app.after_request
+def add_security_headers(resp):
+    resp.headers['Content-Security-Policy']='default-src \'self\''
+    return resp
 
 
 if __name__ == '__main__':
